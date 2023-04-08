@@ -1,0 +1,36 @@
+import requests
+
+# Prompt the user for a rating
+rating = input("What rating do you want to search for? ")
+
+# Make a request to the OMDb API to get all Tarantino movies
+response = requests.get(f"http://www.omdbapi.com/?s=Quentin+Tarantino&type=movie&apikey=YOUR_API_KEY")
+
+# Check if the request was successful
+if response.status_code == 200:
+    # Parse the response JSON data
+    data = response.json()
+
+    # Loop through each movie in the search results
+    for movie in data['Search']:
+        # Get the IMDb ID of the movie
+        imdb_id = movie['imdbID']
+
+        # Make a request to the OMDb API to get the rating of the movie
+        rating_response = requests.get(f"http://www.omdbapi.com/?i={imdb_id}&apikey=YOUR_API_KEY")
+
+        # Check if the request was successful
+        if rating_response.status_code == 200:
+            # Parse the response JSON data
+            rating_data = rating_response.json()
+
+            # Get the rating of the movie
+            movie_rating = rating_data['imdbRating']
+
+            # Check if the rating matches the user's input
+            if float(movie_rating) >= float(rating):
+                # Print the title and rating of the movie
+                print(f"{movie['Title']} ({movie['Year']}), Rating: {movie_rating}")
+else:
+    # Print an error message if the request was unsuccessful
+    print("Error: Failed to retrieve data from OMDb API")
